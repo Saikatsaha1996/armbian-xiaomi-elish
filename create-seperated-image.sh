@@ -21,7 +21,6 @@ sudo mount ${new_rootfs_image} ${new_rootfs_image_mount_dir}
 sudo cp -rfp ${old_rootfs_image_mount_dir}/* ${new_rootfs_image_mount_dir}/
 sudo sed -i "s|${old_rootfs_image_uuid}|${new_rootfs_image_uuid}|g" ${new_rootfs_image_mount_dir}/etc/fstab
 gzip -c ./${new_rootfs_image_mount_dir}/boot/vmlinuz-*-sm8350-arm64 > Image.gz
-do
 cat Image.gz ./${new_rootfs_image_mount_dir}/usr/lib/linux-image-*-sm8350-arm64/qcom/sm8350-realme-porsche.dtb > Image.gz-dtb
 ./mkbootimg.py \
         --kernel Image.gz-dtb \
@@ -34,7 +33,6 @@ cat Image.gz ./${new_rootfs_image_mount_dir}/usr/lib/linux-image-*-sm8350-arm64/
         --tags_offset 0x100 \
         --pagesize 4096 \
         -o armbian-kernel.img
-done
 sudo umount ${new_rootfs_image_mount_dir}
 sudo umount ${old_rootfs_image_mount_dir}
 e2fsck -p -f ${new_rootfs_image}
