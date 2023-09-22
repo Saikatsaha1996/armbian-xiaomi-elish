@@ -20,13 +20,12 @@ sudo mount ${old_rootfs_image} ${old_rootfs_image_mount_dir}
 sudo mount ${new_rootfs_image} ${new_rootfs_image_mount_dir}
 sudo cp -rfp ${old_rootfs_image_mount_dir}/* ${new_rootfs_image_mount_dir}/
 sudo sed -i "s|${old_rootfs_image_uuid}|${new_rootfs_image_uuid}|g" ${new_rootfs_image_mount_dir}/etc/fstab
-gzip -c ./${new_rootfs_image_mount_dir}/boot/vmlinuz-*-sm8250-arm64 > Image.gz
-for panel_type in boe csot
+gzip -c ./${new_rootfs_image_mount_dir}/boot/vmlinuz-*-sm8350-arm64 > Image.gz
 do
-cat Image.gz ./${new_rootfs_image_mount_dir}/usr/lib/linux-image-*-sm8250-arm64/qcom/sm8250-xiaomi-elish-${panel_type}.dtb > Image.gz-dtb-${panel_type}
+cat Image.gz ./${new_rootfs_image_mount_dir}/usr/lib/linux-image-*-sm8350-arm64/qcom/sm8350-realme-porsche.dtb > Image.gz-dtb
 ./mkbootimg.py \
-        --kernel Image.gz-dtb-${panel_type} \
-        --ramdisk ./${new_rootfs_image_mount_dir}/boot/initrd.img-*-sm8250-arm64 \
+        --kernel Image.gz-dtb \
+        --ramdisk ./${new_rootfs_image_mount_dir}/boot/initrd.img-*-sm8350-arm64 \
         --base 0x0 \
         --second_offset 0x00f00000 \
         --cmdline "root=UUID=${new_rootfs_image_uuid}" \
@@ -34,13 +33,12 @@ cat Image.gz ./${new_rootfs_image_mount_dir}/usr/lib/linux-image-*-sm8250-arm64/
         --ramdisk_offset 0x1000000 \
         --tags_offset 0x100 \
         --pagesize 4096 \
-        -o armbian-kernel-${panel_type}.img
+        -o armbian-kernel.img
 done
 sudo umount ${new_rootfs_image_mount_dir}
 sudo umount ${old_rootfs_image_mount_dir}
 e2fsck -p -f ${new_rootfs_image}
 resize2fs -M ${new_rootfs_image}
 xz -z -T0 ${new_rootfs_image}
-xz -z -T0 armbian-kernel-boe.img
-xz -z -T0 armbian-kernel-csot.img
+xz -z -T0 armbian-kernel.img
 rm ${old_rootfs_image} ||true
